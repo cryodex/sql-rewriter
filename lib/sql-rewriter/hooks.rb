@@ -20,10 +20,11 @@ module SQLRewriter
 
           sql_spliced = sql.dup
 
-          binds.map(&:last).each do |bind|
-            sql_spliced.sub!('?', '"' + bind + '"')
-          end
+          # ActiveRecord double quotes everything
+          sql_spliced.gsub!(/([^\\])"/) { $1 + '`' }
 
+          sql_spliced.gsub!('?', '`a`')
+          
           parser = SQLParser::Parser.new
           ast = parser.scan_str(sql_spliced)
 
